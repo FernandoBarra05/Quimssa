@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERP de muestra · QUIMSSA SRL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap">
+<style>
+:root{
+  --green:#1fa12e;--forest:#00582c;--leaf:#00984f;--lime:#98c33e;--cyan:#00c3f5;
+  --ink:#141414;--body:#524b48;--slate:#54595f;--gray:#646464;
+  --surface:#ffffff;--soft:#f5f5f5;--dark:#161616;--line:#c4c4c4;--hair:#e6e6e6;
+  --amber:#f2a900;--red:#b71c1c;
+  --r:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,system-ui,sans-serif;font-size:15px;line-height:22px;color:var(--body);background:#f3f5f3}
+h1,h2,h3{font-family:Poppins,system-ui,sans-serif;color:var(--ink);margin:0}
+p{margin:0}
+button{font-family:inherit;cursor:pointer}
+[hidden]{display:none!important}
+svg{display:block;flex:0 0 auto}
+
+/* Tonos reutilizables (pastillas, chips, iconos) */
+.t-ok{background:#e3f4e6;color:#00582c}
+.t-info{background:#dcf6fd;color:#005b73}
+.t-warn{background:#fff1cc;color:#7a5200}
+.t-bad{background:#fde7e7;color:#b71c1c}
+.t-neutral{background:#ececec;color:#3d3d3d}
+.t-dark{background:#00582c;color:#fff}
+.fb-ok{background:var(--green)}.fb-warn{background:var(--amber)}.fb-bad{background:var(--red)}
+
+/* Estructura */
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 248px;max-width:272px;background:var(--dark);padding:24px 14px;display:flex;flex-direction:column;gap:28px}
+.brand{display:flex;align-items:center;gap:12px;padding:0 10px}
+.logo{width:40px;height:40px;border-radius:50%;background:var(--green);color:var(--ink);display:flex;align-items:center;justify-content:center;font:700 20px Poppins,sans-serif}
+.brand b{display:block;font:700 19px/24px Poppins,system-ui,sans-serif;color:#fff;letter-spacing:.02em}
+.brand div span{display:block;font-size:11px;line-height:16px;letter-spacing:.1em;text-transform:uppercase;color:#a8a8a8}
+.nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.nav button{width:100%;display:flex;align-items:center;gap:12px;min-height:46px;padding:0 14px;background:transparent;border:0;border-radius:12px;color:#c9c9c9;font:500 13px Poppins,system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;text-align:left}
+.nav button:hover{background:#242424;color:#fff}
+.nav button[aria-current=page]{background:var(--forest);color:#fff}
+.nav button[aria-current=page] svg{color:var(--lime)}
+.soon{margin:auto 0 0;padding:16px 14px 0;border-top:1px solid #2c2c2c;display:flex;flex-direction:column;gap:8px}
+.soon h3{font:400 11px/16px Roboto,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8e8e8e}
+.soon p{font-size:14px;color:#8e8e8e}
+.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;padding:18px 32px;background:#fff;border-bottom:1px solid var(--hair)}
+.top h1{font-size:26px;line-height:34px;font-weight:700}
+.top .sub{font-size:14px;line-height:20px;color:var(--slate)}
+.top-r{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.ej{padding:5px 12px;border-radius:999px;background:#eef6d9;color:#42570f;font-size:13px;line-height:20px;font-weight:500}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--green);color:var(--ink);font:700 14px Poppins,sans-serif}
+.content{display:flex;flex-direction:column;gap:24px;padding:28px 32px 40px}
+
+/* Componentes */
+.card{background:#fff;border:1px solid var(--hair);border-radius:var(--r);overflow:hidden}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px}
+.kpi{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#fff;border:1px solid var(--hair);border-radius:var(--r)}
+.kico{flex:0 0 48px;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.kpi .l{font-size:13px;line-height:18px;color:var(--slate)}
+.kpi .v{font:700 30px/38px Poppins,sans-serif;color:var(--ink)}
+.kpi .n{font-size:12px;line-height:17px;color:var(--gray)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+caption{caption-side:top;text-align:left;padding:18px 20px 12px;font:600 17px/24px Poppins,sans-serif;color:var(--ink)}
+th{text-align:left;padding:11px 16px;background:var(--soft);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);font:500 11px Poppins,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
+td{padding:14px 16px;border-bottom:1px solid var(--hair);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#fafbfa}
+td:first-child{border-left:4px solid transparent}
+th:last-child,td:last-child{padding-right:24px}
+#v-table th,#v-table td{padding-left:12px;padding-right:12px}
+#v-table th:last-child,#v-table td:last-child{padding-right:20px}
+tr.sel td{background:#f1f9f2}
+tr.sel td:first-child{border-left-color:var(--green)}
+td .a{display:block;font-weight:500;color:var(--ink)}
+td .b{display:block;font-size:13px;line-height:18px;color:var(--slate)}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:999px;font-size:12px;line-height:18px;font-weight:500;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pill.t-dark::before{background:var(--lime)}
+.pill.ic::before{display:none}
+.btn{min-height:44px;padding:0 25px;border:0;border-radius:30px;background:var(--green);color:var(--ink);font:500 16px Roboto,sans-serif}
+.btn.sm{padding:9px 20px;font-size:14px;line-height:18px;text-align:left}
+.btn.out{border:1px solid #7a7a7a;background:#fff;color:var(--ink)}
+.btn:hover{filter:brightness(.95)}
+.rowbtn{display:flex;flex-direction:column;gap:2px;min-height:44px;justify-content:center;padding:0;border:0;background:transparent;text-align:left}
+.rowbtn .a{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+input[type=number],textarea{border:1px solid #9a9a9a;border-radius:10px;font:400 16px Roboto,sans-serif;color:var(--ink);background:#fff}
+input[type=number]{height:44px;width:120px;padding:0 12px}
+textarea{width:100%;padding:10px 12px;resize:none;font-size:15px;line-height:22px}
+label{font-size:14px;line-height:20px;font-weight:500;color:var(--ink)}
+.toast{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border-left:4px solid var(--green);background:#e3f4e6;color:#00582c;font-weight:500}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+/* Torre */
+.torre{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.torre-main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.route{display:flex;flex-direction:column;gap:24px;padding:22px}
+.route-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}
+.route-head h2{font-size:18px;line-height:26px;font-weight:600}
+.route-head p{font-size:14px;line-height:20px;color:var(--gray)}
+.steps{display:flex;list-style:none;margin:0;padding:0}
+.step{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:10px}
+.stepline{display:flex;align-items:center}
+.node{position:relative;flex:0 0 30px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.node.done{background:var(--green);color:var(--ink)}
+.node.cur{background:var(--cyan)}
+.node.cur i{width:10px;height:10px;border-radius:50%;background:var(--ink)}
+.node.pend{background:#f0f0f0;border:2px solid var(--line)}
+.ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--cyan);animation:pulso 1.6s ease-out infinite}
+@keyframes pulso{0%{transform:scale(1);opacity:.9}100%{transform:scale(2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ring{animation:none}}
+.conn{flex:1 1 auto;height:4px;border-radius:2px;background:var(--hair)}
+.conn.on{background:var(--green)}
+.stepinfo{display:flex;flex-direction:column;gap:2px;padding-right:8px}
+.stepinfo b{font-weight:500;color:var(--ink)}
+.stepinfo .st{font-size:13px;line-height:18px;font-weight:500}
+.stepinfo .tm{font-size:13px;line-height:18px;color:var(--gray)}
+.proj{display:flex;flex-wrap:wrap;gap:24px;padding-top:24px;border-top:1px solid var(--hair)}
+.proj-ctl{flex:1 1 260px;display:flex;flex-direction:column;gap:12px}
+.proj-ctl h3{font-size:16px;line-height:24px;font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick button{min-height:40px;min-width:56px;padding:0 16px;border:1px solid #b5b5b5;border-radius:999px;background:#fff;color:var(--ink);font:500 14px Roboto,sans-serif}
+.quick button:hover{background:var(--soft)}
+.quick button[aria-pressed=true]{background:var(--forest);border-color:var(--forest);color:#fff}
+.proj-res{flex:2 1 340px;display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:12px;background:#f3f8f3}
+.proj-res .e{font-size:12px;line-height:18px;letter-spacing:.07em;text-transform:uppercase;color:var(--slate)}
+.proj-res .t{font:700 22px/30px Poppins,sans-serif;color:var(--ink)}
+.proj-res .d{font-size:14px;line-height:20px;color:var(--slate)}
+.bar{position:relative;height:10px;border-radius:5px;background:#dfe5df;overflow:hidden}
+.bar i{position:absolute;top:0;left:0;height:10px}
+.barlbl{display:flex;justify-content:space-between;gap:12px;font-size:13px;line-height:18px;color:var(--slate)}
+.btn-toggle{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border:1px solid var(--forest);border-radius:30px;background:#fff;color:var(--forest);font:500 15px Roboto,sans-serif}
+.btn-toggle[aria-pressed=true]{background:var(--forest);color:#fff}
+
+/* Teléfono */
+.phone{flex:0 0 344px;padding:12px;background:var(--ink);border-radius:44px}
+.screen{display:flex;flex-direction:column;min-height:700px;background:#fff;border-radius:32px;overflow:hidden}
+.p-head{display:flex;flex-direction:column;gap:2px;padding:22px 20px;background:var(--forest);color:#fff}
+.p-head .e{font-size:11px;line-height:16px;letter-spacing:.1em;text-transform:uppercase;color:#cfe8d6}
+.p-head .t{font:700 20px/28px Poppins,sans-serif}
+.p-head .s{font-size:14px;line-height:20px}
+.p-body{display:flex;flex-direction:column;gap:16px;padding:20px;flex:1 1 auto}
+.p-info{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:12px;background:var(--soft)}
+.p-info .e{font-size:11px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.p-info .c{font-weight:500;color:var(--ink)}
+.p-info .u{font-size:13px;line-height:18px;color:var(--slate)}
+.p-opts{display:flex;flex-direction:column;gap:8px}
+.p-opts>p{font-size:14px;line-height:20px;font-weight:500;color:var(--ink)}
+.opt{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 14px;border:1px solid #b5b5b5;border-radius:12px;background:#fff;color:var(--ink);text-align:left;font:500 15px/20px Roboto,sans-serif}
+.opt i{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:2px solid currentColor}
+.opt[aria-pressed=true]{background:var(--forest);border-color:var(--forest);color:#fff}
+.opt[aria-pressed=true] i{background:var(--lime);border-color:var(--lime)}
+.p-act{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.big{min-height:84px;padding:12px 18px;border:0;border-radius:20px;background:var(--green);color:var(--ink);font:700 16px/22px Poppins,sans-serif;text-align:center}
+.big:hover{filter:brightness(.95)}
+.done-box{min-height:84px;padding:12px 16px;display:flex;align-items:center;justify-content:center;border-radius:20px;background:#ececec;color:var(--ink);font:700 16px/22px Poppins,sans-serif;text-align:center}
+.p-toast{padding:10px 12px;border-radius:12px;border-left:4px solid var(--green);background:#e3f4e6;color:#00582c;font-size:14px;line-height:20px;font-weight:500}
+
+/* Vencimientos */
+.tabs{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;padding:12px 20px 0;border-bottom:1px solid var(--hair)}
+.tablist{display:flex;gap:4px}
+.tablist button{min-height:48px;padding:0 22px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--slate);font:500 13px Poppins,sans-serif;letter-spacing:.05em;text-transform:uppercase}
+.tablist button:hover{color:var(--ink)}
+.tablist button[aria-selected=true]{border-bottom-color:var(--green);color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:10px}
+.filters button{min-height:40px;padding:0 16px;border:1px solid #b5b5b5;border-radius:999px;background:#fff;color:var(--ink);font:500 14px Roboto,sans-serif}
+.filters button:hover{background:var(--soft)}
+.filters button[aria-pressed=true]{background:var(--forest);border-color:var(--forest);color:#fff}
+.hint{display:flex;align-items:center;gap:8px;padding:14px 20px 12px;font-size:13px;line-height:18px;color:var(--gray)}
+.foot{padding:14px 20px;border-top:1px solid var(--hair);font-size:13px;line-height:20px;color:var(--gray)}
+.dt{display:block;font-size:12px;line-height:16px;color:var(--slate)}
+.chip{display:inline-flex;align-items:center;gap:6px;margin-top:5px;padding:4px 11px;border:0;border-radius:999px;font:500 12px/18px Roboto,sans-serif;text-align:left;white-space:nowrap}
+button.chip:hover{filter:brightness(.94)}
+.life{display:block;width:116px;height:4px;margin-top:7px;border-radius:2px;background:var(--hair);overflow:hidden}
+.life i{display:block;height:4px;border-radius:2px}
+.tip{position:relative;display:inline-block}
+.blk{display:inline-flex;align-items:center;gap:7px;padding:6px 14px 6px 11px;border:0;border-radius:999px;background:var(--red);color:#fff;font:700 12px/18px Roboto,sans-serif;letter-spacing:.04em;text-align:left;cursor:help;white-space:nowrap}
+.tipbox{display:none;position:absolute;right:0;bottom:100%;margin-bottom:8px;width:260px;padding:10px 12px;border-radius:10px;background:var(--ink);color:#fff;font-size:13px;line-height:18px;font-weight:400;z-index:5;white-space:normal}
+.tip:hover .tipbox,.tip:focus-within .tipbox{display:block}
+
+/* Manifiestos: recorrido documental */
+.dsum{margin-bottom:6px;font-size:12px;line-height:16px;color:var(--slate)}
+.dsum b{color:var(--ink)}
+.doctrack{display:flex;min-width:312px}
+.dstep{position:relative;flex:1 1 0;min-width:78px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px 6px;border:0;border-radius:10px;background:transparent;font-family:Roboto,sans-serif;text-align:center}
+.dstep:hover{background:var(--soft)}
+.dstep:not(:last-child)::after{content:"";position:absolute;top:21px;left:calc(50% + 20px);width:calc(100% - 40px);height:3px;border-radius:2px;background:var(--hair)}
+.dstep.link::after{background:var(--green)}
+.dc{position:relative;z-index:1;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.d-ok .dc{background:var(--green);color:var(--ink)}
+.d-pend .dc{background:#fff1cc;color:#7a5200;border:2px solid var(--amber)}
+.d-falta .dc{background:var(--red);color:#fff}
+.dn{font-size:12px;line-height:16px;font-weight:500;color:var(--ink)}
+.ds{font-size:11px;line-height:14px;font-weight:500}
+.d-ok .ds{color:#00582c}.d-pend .ds{color:#7a5200}.d-falta .ds{color:var(--red)}
+.acts{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.alert{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;border-left:4px solid var(--red);background:#fde7e7;align-self:stretch}
+.alert p{display:flex;align-items:center;gap:8px;font-size:13px;line-height:18px;font-weight:700;color:var(--red)}
+
+/* Modales */
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;padding:32px 24px;overflow-y:auto;background:rgba(20,20,20,.6);z-index:20}
+.modal{width:100%;max-width:480px;margin:auto;display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:18px;background:#fff}
+.modal.doc{max-width:700px;margin:0 auto;padding:32px}
+.modal h2{font-size:22px;line-height:30px;font-weight:700}
+.kv{display:flex;flex-direction:column;border-top:1px solid var(--hair)}
+.kv div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--hair)}
+.kv span:first-child{font-size:14px;line-height:20px;color:var(--slate)}
+.kv span:last-child{font-weight:500;color:var(--ink);text-align:right}
+.mact{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:12px}
+.dochead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.dochead .e{font-size:12px;line-height:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.dochead h2{font-size:26px;line-height:34px}
+.docsec{display:flex;flex-direction:column;gap:6px}
+.docsec h3{font:500 14px/20px Poppins,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--forest)}
+.docgrid{display:grid;grid-template-columns:160px minmax(0,1fr);border-top:1px solid var(--line)}
+.docgrid p{padding:8px 0;border-bottom:1px solid var(--hair);font-size:14px;line-height:20px;color:var(--ink)}
+.docgrid p:nth-child(odd){color:var(--slate)}
+.firmas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px}
+.firma{display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--line);border-radius:10px;min-height:84px}
+.firma .e{font-size:12px;line-height:18px;text-transform:uppercase;letter-spacing:.06em;color:var(--slate)}
+.firma p{font-size:13px;line-height:18px;color:var(--slate)}
+.firma p.f{font-weight:500;color:var(--ink)}
+
+@media (max-width:900px){
+  .side{max-width:none;flex-basis:100%;padding:16px}
+  .nav{flex-direction:row;flex-wrap:wrap}
+  .nav button{width:auto}
+  .soon{display:none}
+  .top,.content{padding-left:16px;padding-right:16px}
+  .phone{flex:1 1 344px;max-width:344px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="side" aria-label="Módulos">
+  <div class="brand"><span class="logo" aria-hidden="true">Q</span><div><b>QUIMSSA</b><span>Sistema ERP</span></div></div>
+  <ul class="nav">
+    <li><button type="button" data-act="nav" data-v="torre"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 19c0-6 14-2 14-12"/><circle cx="5" cy="19" r="1.5"/><circle cx="19" cy="7" r="1.5"/></svg>Torre de Control</button></li>
+    <li><button type="button" data-act="nav" data-v="venc"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Vencimientos</button></li>
+    <li><button type="button" data-act="nav" data-v="man"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg>Manifiestos</button></li>
+  </ul>
+  <div class="soon"><h3>Próximos módulos</h3><p>Compras e Inventario</p><p>Ventas y Facturación</p><p>Finanzas y Reportes</p></div>
+</nav>
+
+<main class="main">
+  <header class="top">
+    <div><h1 id="titulo"></h1><p class="sub" id="subtitulo"></p></div>
+    <div class="top-r">
+      <button type="button" class="btn-toggle" id="btn-driver" data-act="driver" aria-pressed="true"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Vista aplicativo conductor</button>
+      <span class="ej">Datos de ejemplo</span>
+      <span class="avatar" role="img" aria-label="Usuario: Despachador">DE</span>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- ============ TORRE DE CONTROL ============ -->
+    <section id="v-torre" class="torre" aria-label="Torre de Control Logístico">
+      <div class="torre-main">
+        <div class="kpis" id="t-kpis"></div>
+        <div class="card scroll">
+          <table style="min-width:760px">
+            <caption>Viajes activos de químicos</caption>
+            <thead><tr><th>Viaje</th><th>Unidad</th><th>Conductor</th><th>Químico</th><th>Estado</th><th>Próximo punto</th></tr></thead>
+            <tbody id="t-viajes"></tbody>
+          </table>
+        </div>
+        <section class="card route">
+          <div class="route-head" id="t-head"></div>
+          <ol class="steps" id="t-steps"></ol>
+          <div class="proj">
+            <div class="proj-ctl">
+              <h3>¿Dónde estará en X horas?</h3>
+              <div class="field"><label for="t-horas">Horas a proyectar desde el último reporte</label><input id="t-horas" type="number" min="0" max="48" step="0.5" value="5"></div>
+              <div class="quick" id="t-quick"></div>
+            </div>
+            <div class="proj-res" id="t-proj"></div>
+          </div>
+        </section>
+        <div class="card scroll">
+          <table style="min-width:700px">
+            <caption id="t-bit-cap"></caption>
+            <thead><tr><th>Hora</th><th>Punto</th><th>Estado MATPEL</th><th>Seguridad de la carga</th><th>Observación del conductor</th></tr></thead>
+            <tbody id="t-bit"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="phone" id="phone" aria-label="Vista aplicativo conductor">
+        <div class="screen">
+          <div class="p-head" id="p-head"></div>
+          <div class="p-body">
+            <div class="p-info" id="p-info"></div>
+            <div class="p-opts" role="group" aria-label="Estado MATPEL"><p>Estado MATPEL antes de confirmar</p><div class="p-opts" id="p-opts"></div></div>
+            <div class="field"><label for="obs">Observaciones (opcional)</label><textarea id="obs" rows="2" placeholder="Ej.: precintos verificados"></textarea></div>
+            <div class="p-act" id="p-act"></div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ============ VENCIMIENTOS ============ -->
+    <section id="v-venc" hidden aria-label="Vencimientos de Flota y Licencias A-IV" style="display:flex;flex-direction:column;gap:24px">
+      <div class="toast" id="v-toast" role="status" hidden></div>
+      <div class="kpis" id="v-kpis"></div>
+      <section class="card">
+        <div class="tabs">
+          <div class="tablist" role="tablist" aria-label="Tipo de control">
+            <button type="button" role="tab" id="tab-flota" data-act="tab" data-t="flota">Flota MATPEL</button>
+            <button type="button" role="tab" id="tab-cond" data-act="tab" data-t="cond">Conductores A-IV</button>
+          </div>
+          <div class="filters" id="v-filters" role="group" aria-label="Filtro rápido"></div>
+        </div>
+        <p class="hint" id="v-hint"></p>
+        <div class="scroll" role="tabpanel"><table style="min-width:1040px" id="v-table"></table></div>
+        <p class="foot">La barra bajo cada fecha muestra la vigencia restante (hasta 1 año). Un documento vencido bloquea la asignación en Trazabilidad.</p>
+      </section>
+    </section>
+
+    <!-- ============ MANIFIESTOS ============ -->
+    <section id="v-man" hidden aria-label="Manifiestos Ambientales y Documentación MATPEL" style="display:flex;flex-direction:column;gap:24px">
+      <div class="toast" id="m-toast" role="status" hidden></div>
+      <div class="kpis" id="m-kpis"></div>
+      <section class="card">
+        <div class="scroll">
+          <table style="min-width:1100px">
+            <caption>Expedientes por servicio y despacho</caption>
+            <thead><tr><th>Expediente y generador</th><th>Tipo de carga</th><th>Placa y conductor</th><th>Semáforo documental</th><th>Estado y acciones</th></tr></thead>
+            <tbody id="m-rows"></tbody>
+          </table>
+        </div>
+        <p class="foot">Haz clic en un documento pendiente o faltante para marcarlo como validado (simulación). El CDF se emite al cierre del viaje.</p>
+      </section>
+    </section>
+  </div>
+</main>
+</div>
+
+<div class="overlay" id="modal-venc" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mv-titulo" id="mv-box"></div></div>
+<div class="overlay" id="modal-man" hidden><div class="modal doc" role="dialog" aria-modal="true" aria-labelledby="mm-titulo" id="mm-box"></div></div>
+
+<script>
+(function () {
+'use strict';
+var $ = function (s) { return document.querySelector(s); };
+var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+var BASE = Date.now();
+var fmtT = function (ms) { return new Date(ms).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false }); };
+var fmtD = function (ms) { return new Date(ms).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }); };
+var dayTag = function (ms) {
+  var a = new Date(BASE); a.setHours(0, 0, 0, 0);
+  var b = new Date(ms); b.setHours(0, 0, 0, 0);
+  var d = Math.round((b - a) / 86400000);
+  if (d === 0) return '';
+  if (d === 1) return ' (mañana)';
+  if (d === -1) return ' (ayer)';
+  return d > 0 ? ' (+' + d + ' d)' : ' (' + d + ' d)';
+};
+
+/* Iconos de trazo */
+var ICONS = {
+  check: '<path d="M5 12l5 5 9-10"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  truck: '<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  bell: '<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+  file: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 14l2 2 4-4"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v5M12 16h.01"/>',
+  award: '<circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/>',
+  route: '<path d="M5 19c0-6 14-2 14-12"/><circle cx="5" cy="19" r="1.5"/><circle cx="19" cy="7" r="1.5"/>',
+  alert: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+  refresh: '<path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/>',
+  pause: '<path d="M9 6v12M15 6v12"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'
+};
+var ico = function (n, s, w) {
+  return '<svg aria-hidden="true" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + ICONS[n] + '</svg>';
+};
+var pill = function (t, tone) { return '<span class="pill t-' + tone + '">' + esc(t) + '</span>'; };
+var kpi = function (icon, tone, label, value, note) {
+  return '<div class="kpi"><span class="kico t-' + tone + '">' + ico(icon, 24, 1.8) + '</span><div><p class="l">' + label + '</p><p class="v">' + value + '</p>' + (note ? '<p class="n">' + note + '</p>' : '') + '</div></div>';
+};
+
+/* =========================================================
+   TORRE DE CONTROL
+   ========================================================= */
+var ev = function (min, idx, status, note) { return { t: BASE - min * 60000, idx: idx, status: status, note: note }; };
+var T = {
+  sel: 0, hoursRaw: '5', showDriver: true, drv: 'ok', toast: '',
+  routes: [
+    { titulo: 'Ruta 1', placa: 'V9A-842', unidad: 'Tractocamión Volvo FH', conductor: 'Edwin Mamani Condori', carga: 'Ácido Sulfúrico', onu: 'ONU 1830', last: 0,
+      puntos: [{ n: 'Arequipa', leg: 0 }, { n: 'La Joya', leg: 70 }, { n: 'Moquegua', leg: 165 }, { n: 'Ilo', leg: 105 }],
+      eventos: [ev(25, 0, 'ok', 'Salida de planta en Arequipa. Precintos N.º 0041 a 0043 verificados.')] },
+    { titulo: 'Ruta 2', placa: 'V4B-910', unidad: 'Cisterna Ácido', conductor: 'Percy Huamán Ccori', carga: 'Ácido Clorhídrico', onu: 'ONU 1789', last: 1,
+      puntos: [{ n: 'Arequipa', leg: 0 }, { n: 'Chivay', leg: 210 }, { n: 'Caylloma', leg: 150 }, { n: 'Espinar', leg: 180 }],
+      eventos: [ev(260, 0, 'ok', 'Salida de planta en Arequipa. Válvulas y precintos conformes.'), ev(50, 1, 'parada', 'Descanso reglamentario del conductor en Chivay. Precintos intactos.')] },
+    { titulo: 'Ruta 3', placa: 'V7C-731', unidad: 'Furgón Hermético', conductor: 'Rolando Apaza Mamani', carga: 'Hipoclorito de Calcio', onu: 'ONU 1748', last: 1,
+      puntos: [{ n: 'Arequipa', leg: 0 }, { n: 'Camaná', leg: 170 }, { n: 'Chala', leg: 200 }, { n: 'Nazca', leg: 160 }],
+      eventos: [ev(190, 0, 'ok', 'Salida de planta en Arequipa. Carga estibada y precintada.'), ev(20, 1, 'demora', 'Tránsito lento por trabajos en la vía. Sin afectación a la carga.')] }
+  ]
+};
+var META = {
+  ok: { label: 'Carga y precintos OK', corto: 'En ruta', tone: 'ok', carga: 'Segura · precintos OK', nota: 'Llegada confirmada. Carga y precintos OK.' },
+  parada: { label: 'Parada técnica / Descanso', corto: 'Parada técnica', tone: 'info', carga: 'Segura · bajo custodia', nota: 'Parada técnica / descanso reglamentario.' },
+  demora: { label: 'Demora en vía / Incidente', corto: 'Demora / incidente', tone: 'warn', carga: 'En seguimiento', nota: 'Demora en vía reportada por el conductor.' }
+};
+var cumOf = function (r) { var a = 0; return r.puntos.map(function (p) { a += p.leg; return a; }); };
+var recorrido = function (r) { return r.puntos.map(function (p) { return p.n; }).join(' → '); };
+var terminado = function (r) { return r.last >= r.puntos.length - 1; };
+var estadoOf = function (r) {
+  if (terminado(r)) return { corto: 'Completado', tone: 'dark' };
+  var m = META[r.eventos[r.eventos.length - 1].status];
+  return { corto: m.corto, tone: m.tone };
+};
+var hoursOf = function () { return Math.max(0, Math.min(48, parseFloat(T.hoursRaw) || 0)); };
+
+function renderViajes() {
+  var act = T.routes.filter(function (r) { return !terminado(r); });
+  var mov = act.filter(function (r) { return r.eventos[r.eventos.length - 1].status === 'ok'; }).length;
+  $('#t-kpis').innerHTML =
+    kpi('route', 'ok', 'Viajes activos', act.length, 'de ' + T.routes.length + ' programados') +
+    kpi('truck', 'info', 'En movimiento', mov, 'Carga y precintos OK') +
+    kpi('alert', 'warn', 'Con parada o demora', act.length - mov, 'En seguimiento');
+  $('#t-viajes').innerHTML = T.routes.map(function (r, i) {
+    var c = cumOf(r), fin = terminado(r), u = r.eventos[r.eventos.length - 1], es = estadoOf(r);
+    var prox = fin ? 'Destino alcanzado' : esc(r.puntos[r.last + 1].n) + ' · ETA ' + fmtT(u.t + (c[r.last + 1] - c[r.last]) * 60000);
+    return '<tr class="' + (i === T.sel ? 'sel' : '') + '">' +
+      '<td><button type="button" class="rowbtn" data-act="route" data-i="' + i + '" aria-pressed="' + (i === T.sel) + '"><span class="a">' + esc(r.titulo) + '</span><span class="b">' + esc(recorrido(r)) + '</span></button></td>' +
+      '<td><span class="a">' + esc(r.placa) + '</span><span class="b">' + esc(r.unidad) + '</span></td>' +
+      '<td>' + esc(r.conductor) + '</td>' +
+      '<td><span class="a">' + esc(r.carga) + '</span><span class="b">' + esc(r.onu) + '</span></td>' +
+      '<td>' + pill(es.corto, es.tone) + '</td><td>' + prox + '</td></tr>';
+  }).join('');
+}
+
+function projection(r) {
+  var n = r.puntos.length, cum = cumOf(r), total = cum[n - 1], fin = terminado(r);
+  var ult = r.eventos[r.eventos.length - 1], hours = hoursOf(), dest = r.puntos[n - 1].n;
+  var etaMs = ult.t + (total - cum[r.last]) * 60000;
+  var projMin = cum[r.last] + hours * 60, projMs = ult.t + hours * 3600000;
+  var texto, detalle;
+  if (fin) { texto = 'Viaje completado en ' + dest; detalle = 'El camión ya llegó al destino final.'; }
+  else if (projMin >= total) { texto = 'Habrá llegado a ' + dest; detalle = 'Llegada estimada a las ' + fmtT(etaMs) + dayTag(etaMs); }
+  else if (hours === 0) { texto = 'En ' + r.puntos[r.last].n; detalle = 'Último punto reportado por el conductor.'; }
+  else {
+    var i = r.last + 1;
+    while (i < n && projMin >= cum[i]) i++;
+    if (projMin === cum[i - 1]) { texto = 'En ' + r.puntos[i - 1].n; detalle = 'Punto de control de la ruta.'; }
+    else {
+      var pct = Math.round((projMin - cum[i - 1]) / r.puntos[i].leg * 100);
+      texto = 'Tramo ' + r.puntos[i - 1].n + ' → ' + r.puntos[i].n; detalle = pct + ' % del tramo recorrido.';
+    }
+  }
+  return {
+    hora: fmtT(projMs) + dayTag(projMs), texto: texto, detalle: detalle, dest: dest,
+    eta: fin ? 'Llegó a ' + dest : fmtT(etaMs) + dayTag(etaMs),
+    pctRep: Math.round(cum[r.last] / total * 100) + '%',
+    pctProy: Math.round(Math.min(100, projMin / total * 100)) + '%'
+  };
+}
+
+function renderProj() {
+  var r = T.routes[T.sel], p = projection(r), h = hoursOf();
+  $('#t-proj').innerHTML =
+    '<div><p class="e">Ubicación proyectada a las ' + esc(p.hora) + '</p><p class="t">' + esc(p.texto) + '</p><p class="d">' + esc(p.detalle) + '</p></div>' +
+    '<div><div class="bar" aria-hidden="true"><i style="background:#00c3f5;width:' + p.pctProy + '"></i><i style="background:#1fa12e;width:' + p.pctRep + '"></i></div>' +
+    '<div class="barlbl"><span>Reportado: ' + p.pctRep + ' de la ruta</span><span>Proyectado: ' + p.pctProy + '</span></div></div>' +
+    '<p style="color:#141414"><strong style="font-weight:500">ETA al destino final (' + esc(p.dest) + '):</strong> ' + esc(p.eta) + '</p>';
+  $('#t-quick').innerHTML = [2, 5, 8, 12].map(function (q) {
+    return '<button type="button" data-act="hours" data-h="' + q + '" aria-pressed="' + (h === q) + '">' + q + ' h</button>';
+  }).join('');
+}
+
+function renderRuta() {
+  var r = T.routes[T.sel], n = r.puntos.length, cum = cumOf(r), fin = terminado(r);
+  var ult = r.eventos[r.eventos.length - 1], es = estadoOf(r);
+  $('#t-head').innerHTML =
+    '<div><h2>' + esc(r.titulo) + ' · ' + esc(recorrido(r)) + '</h2><p>' + esc(r.placa) + ' · ' + esc(r.conductor) + ' · ' + esc(r.carga) + ' (' + esc(r.onu) + ')</p></div>' + pill(es.corto, es.tone);
+  $('#t-steps').innerHTML = r.puntos.map(function (p, i) {
+    var done = fin ? true : i < r.last, cur = !fin && i === r.last;
+    var e = r.eventos.filter(function (x) { return x.idx === i; })[0];
+    var eta = ult.t + (cum[i] - cum[r.last]) * 60000;
+    var node = cur ? '<span class="node cur"><span class="ring"></span><i></i></span>'
+      : done ? '<span class="node done">' + ico('check', 16, 3) + '</span>'
+      : '<span class="node pend"></span>';
+    var conn = i < n - 1 ? '<span class="conn ' + (fin || i < r.last ? 'on' : '') + '"></span>' : '';
+    return '<li class="step"><div class="stepline">' + node + conn + '</div><div class="stepinfo"><b>' + esc(p.n) + '</b>' +
+      '<span class="st" style="color:' + (done ? '#00582c' : cur ? '#006b8a' : '#646464') + '">' + (done ? 'Completado' : cur ? 'Ubicación actual' : 'Pendiente') + '</span>' +
+      '<span class="tm">' + (e ? 'Reporte ' + fmtT(e.t) : 'ETA ' + fmtT(eta) + dayTag(eta)) + '</span></div></li>';
+  }).join('');
+  renderProj();
+  $('#t-bit-cap').textContent = 'Bitácora de eventos · ' + r.titulo + ' (' + r.placa + ')';
+  $('#t-bit').innerHTML = r.eventos.slice().reverse().map(function (e) {
+    var m = META[e.status];
+    return '<tr><td style="white-space:nowrap"><span class="a">' + fmtT(e.t) + '</span></td><td style="white-space:nowrap">' + esc(r.puntos[e.idx].n) + '</td><td>' + pill(m.label, m.tone) + '</td><td>' + esc(m.carga) + '</td><td>' + esc(e.note) + '</td></tr>';
+  }).join('');
+}
+
+function renderPhone() {
+  var r = T.routes[T.sel], n = r.puntos.length, fin = terminado(r), ult = r.eventos[r.eventos.length - 1];
+  $('#phone').hidden = !T.showDriver;
+  $('#btn-driver').setAttribute('aria-pressed', String(T.showDriver));
+  $('#p-head').innerHTML = '<p class="e">QUIMSSA · App del conductor</p><p class="t">' + esc(r.placa) + ' · ' + esc(r.titulo) + '</p><p class="s">' + esc(r.conductor) + '</p>';
+  $('#p-info').innerHTML = '<p class="e">Carga</p><p class="c">' + esc(r.carga) + ' · ' + esc(r.onu) + '</p><p class="u">Último reporte: ' + fmtT(ult.t) + ' · ' + esc(r.puntos[r.last].n) + '</p>';
+  $('#p-opts').innerHTML = ['ok', 'parada', 'demora'].map(function (k) {
+    return '<button type="button" class="opt" data-act="drv" data-k="' + k + '" aria-pressed="' + (T.drv === k) + '"><i aria-hidden="true"></i>' + esc(META[k].label) + '</button>';
+  }).join('');
+  $('#p-act').innerHTML =
+    (fin ? '<p class="done-box">Viaje completado en ' + esc(r.puntos[n - 1].n) + '</p>'
+         : '<button type="button" class="big" data-act="confirm">Confirmar Llegada al Siguiente Punto: ' + esc(r.puntos[r.last + 1].n) + '</button>') +
+    (T.toast ? '<p class="p-toast" role="status">' + esc(T.toast) + '</p>' : '');
+}
+
+function renderTorre() { renderViajes(); renderRuta(); renderPhone(); }
+
+function confirmar() {
+  var r = T.routes[T.sel];
+  if (terminado(r)) return;
+  var idx = r.last + 1, t = Date.now();
+  var note = $('#obs').value.trim() || META[T.drv].nota;
+  r.last = idx;
+  r.eventos.push({ t: t, idx: idx, status: T.drv, note: note });
+  T.toast = 'Reporte enviado a la Torre de Control · ' + r.puntos[idx].n + ' registrada a las ' + fmtT(t);
+  T.drv = 'ok';
+  $('#obs').value = '';
+  renderTorre();
+}
+
+/* =========================================================
+   VENCIMIENTOS
+   ========================================================= */
+var Y = new Date(BASE); Y.setFullYear(Y.getFullYear() + 1);
+var RENOVAR = Math.round((Y.getTime() - BASE) / 86400000);
+var DOCS = {
+  flota: ['Habilitación Vehicular MTC (MATPEL)', 'Revisión Técnica Vehicular (CITV)', 'SOAT y Póliza de Responsabilidad Civil Ambiental', 'Prueba de Hermeticidad / Calibración de Tanque'],
+  cond: ['Licencia Profesional A-IIIc', 'Licencia Especial A-IV (Materiales Peligrosos)', 'Examen Médico Ocupacional (EMO)', 'Curso de Seguridad y Manejo Defensivo / MATPEL']
+};
+var HEADS = {
+  flota: ['Unidad', 'Habilitación Vehicular MTC (MATPEL)', 'Revisión Técnica (CITV)', 'SOAT y Póliza RC Ambiental', 'Hermeticidad / Calibración de tanque', 'Estado operativo'],
+  cond: ['Conductor', 'Licencia Profesional A-IIIc', 'Licencia Especial A-IV (Mat. Peligrosos)', 'Examen Médico Ocupacional (EMO)', 'Manejo Defensivo / Curso MATPEL', 'Estado operativo']
+};
+var V = {
+  tab: 'flota', filtro: 'todos', modal: null, toast: '',
+  flota: [
+    { nombre: 'V9A-842', sub: 'Tractocamión Volvo FH', docs: [210, 95, 140, 60] },
+    { nombre: 'V4B-910', sub: 'Cisterna Ácido', docs: [18, 120, 75, 200] },
+    { nombre: 'V7C-731', sub: 'Furgón Hermético', docs: [300, 22, 180, 150] },
+    { nombre: 'V2D-558', sub: 'Cisterna Cáustico', docs: [90, 250, 14, 110] },
+    { nombre: 'V5E-267', sub: 'Tractocamión Scania R450', docs: [160, 180, 260, 45] },
+    { nombre: 'V8F-134', sub: 'Camión Baranda MATPEL', docs: [-6, 140, 90, 70] },
+    { nombre: 'V1G-679', sub: 'Cisterna Aceites Usados', docs: [220, 60, 300, 25] },
+    { nombre: 'V6H-405', sub: 'Furgón Hermético', docs: [75, 330, 110, 185] },
+    { nombre: 'V3J-822', sub: 'Cisterna Lodos', docs: [130, 85, 200, -12] },
+    { nombre: 'V9K-316', sub: 'Tractocamión Volvo FH', docs: [260, 150, 55, 90] },
+    { nombre: 'V4L-097', sub: 'Cisterna Ácido', docs: [40, 28, 130, 170] },
+    { nombre: 'V7M-543', sub: 'Camión Volquete Hermético', docs: [190, 210, 160, 120] }
+  ],
+  cond: [
+    { nombre: 'Edwin Mamani Condori', sub: 'Conductor MATPEL', docs: [400, 150, 95, 210] },
+    { nombre: 'Percy Huamán Ccori', sub: 'Conductor MATPEL', docs: [250, 12, 180, 140] },
+    { nombre: 'Rolando Apaza Mamani', sub: 'Conductor MATPEL', docs: [330, 270, 60, 75] },
+    { nombre: 'Wilber Choque Yucra', sub: 'Conductor MATPEL', docs: [180, -4, 110, 200] },
+    { nombre: 'Henry Quispe Lupaca', sub: 'Conductor MATPEL', docs: [90, 200, 20, 160] },
+    { nombre: 'Jhon Callo Mamani', sub: 'Conductor MATPEL', docs: [520, 310, 150, 90] },
+    { nombre: 'Raúl Cutipa Huanca', sub: 'Conductor MATPEL', docs: [210, 130, -9, 100] },
+    { nombre: 'Freddy Turpo Challco', sub: 'Conductor MATPEL', docs: [140, 85, 70, 26] },
+    { nombre: 'Marco Ccama Layme', sub: 'Conductor MATPEL', docs: [300, 190, 125, 180] },
+    { nombre: 'Néstor Flores Apaza', sub: 'Conductor MATPEL', docs: [60, 100, 230, 24] }
+  ]
+};
+var vFecha = function (d) { return fmtD(BASE + d * 86400000); };
+var chip = function (d) {
+  if (d < 0) return { txt: 'Vencido hace ' + (-d) + (d === -1 ? ' día' : ' días'), tone: 'bad', ic: 'alert', abre: true };
+  if (d <= 30) return { txt: d === 0 ? 'Vence hoy' : 'Por vencer en ' + d + (d === 1 ? ' día' : ' días'), tone: 'warn', ic: 'clock', abre: true };
+  return { txt: 'Vigente', tone: 'ok', ic: 'check', abre: false };
+};
+var life = function (d, tone) {
+  var w = d < 0 ? 100 : Math.max(4, Math.min(100, Math.round(d / 365 * 100)));
+  return '<span class="life" aria-hidden="true"><i class="fb-' + tone + '" style="width:' + w + '%"></i></span>';
+};
+var vRows = function (kind) {
+  return V[kind].map(function (it, i) {
+    return { it: it, i: i, rojo: it.docs.some(function (d) { return d < 0; }), ambar: it.docs.some(function (d) { return d >= 0 && d <= 30; }) };
+  });
+};
+
+function renderVenc() {
+  var flota = vRows('flota'), cond = vRows('cond');
+  var cuenta = function (l) { return l.reduce(function (a, it) { return a + it.docs.filter(function (d) { return d >= 0 && d <= 30; }).length; }, 0); };
+  var aF = cuenta(V.flota), aC = cuenta(V.cond);
+  var rF = flota.filter(function (r) { return r.rojo; }).length, rC = cond.filter(function (r) { return r.rojo; }).length;
+  $('#v-kpis').innerHTML =
+    kpi('truck', 'ok', 'Flota habilitada', (V.flota.length - rF) + ' / ' + V.flota.length, 'Unidades activas, sin documentos vencidos') +
+    kpi('bell', 'warn', 'Alertas preventivas (menos de 30 días)', (aF + aC), aF + ' documentos en flota · ' + aC + ' en conductores') +
+    kpi('lock', 'bad', 'Bloqueos críticos (vencidos)', (rF + rC), rF + (rF === 1 ? ' unidad' : ' unidades') + ' · ' + rC + (rC === 1 ? ' conductor' : ' conductores') + ' sin poder salir a ruta');
+
+  var esFlota = V.tab === 'flota', actuales = esFlota ? flota : cond;
+  $('#tab-flota').setAttribute('aria-selected', String(esFlota));
+  $('#tab-cond').setAttribute('aria-selected', String(!esFlota));
+  var fb = function (id, txt) { return '<button type="button" data-act="filter" data-f="' + id + '" aria-pressed="' + (V.filtro === id) + '">' + txt + '</button>'; };
+  $('#v-filters').innerHTML = fb('todos', 'Todos (' + actuales.length + ')') +
+    fb('vencer', 'Por vencer (' + actuales.filter(function (r) { return r.ambar; }).length + ')') +
+    fb('vencidos', 'Vencidos (' + actuales.filter(function (r) { return r.rojo; }).length + ')');
+  $('#v-hint').innerHTML = ico('info', 16, 1.8) + 'Haz clic en un documento vencido o por vencer para renovarlo.';
+
+  var vis = actuales.filter(function (r) { return V.filtro === 'vencer' ? r.ambar : V.filtro === 'vencidos' ? r.rojo : true; });
+  var head = '<thead><tr>' + HEADS[V.tab].map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead>';
+  var body = vis.map(function (r) {
+    var celdas = r.it.docs.map(function (d, k) {
+      var c = chip(d);
+      var inner = c.abre
+        ? '<button type="button" class="chip t-' + c.tone + '" data-act="renew" data-i="' + r.i + '" data-k="' + k + '" aria-label="Renovar documento: ' + esc(DOCS[V.tab][k]) + ' de ' + esc(r.it.nombre) + '">' + ico(c.ic, 13, 2.4) + esc(c.txt) + ico('refresh', 12, 2.4) + '</button>'
+        : '<span class="chip t-' + c.tone + '">' + ico(c.ic, 13, 2.6) + esc(c.txt) + '</span>';
+      return '<td><span class="dt">Vence: ' + vFecha(d) + '</span>' + inner + life(d, c.tone) + '</td>';
+    }).join('');
+    var tipId = 'tip-' + V.tab + '-' + r.i;
+    var txtTip = esFlota ? 'Esta unidad tiene un documento vencido. El sistema impide asignarla a un despacho en el módulo de Trazabilidad hasta que se renueve.'
+      : 'Este conductor tiene un documento vencido. El sistema impide asignarlo a un despacho en el módulo de Trazabilidad hasta que se renueve.';
+    var estado = r.rojo
+      ? '<span class="tip"><button type="button" class="blk" aria-describedby="' + tipId + '">' + ico('lock', 14, 2.4) + 'BLOQUEADO PARA DESPACHO</button><span id="' + tipId + '" role="tooltip" class="tipbox">' + txtTip + '</span></span>'
+      : '<span class="pill ic t-ok">' + ico('check', 14, 2.6) + (esFlota ? 'Habilitada' : 'Habilitado') + ' para despacho</span>';
+    return '<tr><td><span class="a">' + esc(r.it.nombre) + '</span><span class="b">' + esc(r.it.sub) + '</span></td>' + celdas + '<td>' + estado + '</td></tr>';
+  }).join('');
+  $('#v-table').innerHTML = head + '<tbody>' + (body || '<tr><td colspan="6" style="padding:24px 20px;color:#54595f">Ningún registro coincide con el filtro seleccionado.</td></tr>') + '</tbody>';
+
+  var t = $('#v-toast');
+  t.hidden = !V.toast; t.innerHTML = V.toast ? ico('check', 18, 2.6) + '<span>' + esc(V.toast) + '</span>' : '';
+
+  var mo = $('#modal-venc');
+  if (V.modal) {
+    var m = V.modal, it = V[m.kind][m.i], d = it.docs[m.k];
+    $('#mv-box').innerHTML =
+      '<h2 id="mv-titulo">Renovar documento</h2><div class="kv">' +
+      '<div><span>' + (m.kind === 'flota' ? 'Unidad' : 'Conductor') + '</span><span>' + esc(m.kind === 'flota' ? it.nombre + ' · ' + it.sub : it.nombre) + '</span></div>' +
+      '<div><span>Documento</span><span>' + esc(DOCS[m.kind][m.k]) + '</span></div>' +
+      '<div><span>Vencimiento actual</span><span>' + vFecha(d) + ' · ' + esc(chip(d).txt) + '</span></div>' +
+      '<div><span>Nuevo vencimiento (+1 año)</span><span style="color:#00582c;font-weight:700">' + vFecha(RENOVAR) + '</span></div></div>' +
+      '<p style="font-size:14px;line-height:22px">Al confirmar, la fecha se actualiza a un año desde hoy, el semáforo pasa a verde y los indicadores se recalculan.</p>' +
+      '<div class="mact"><button type="button" class="btn out" data-act="renew-cancel">Cancelar</button><button type="button" class="btn" data-act="renew-ok" id="mv-ok">Confirmar renovación →</button></div>';
+    mo.hidden = false;
+  } else { mo.hidden = true; }
+}
+
+function renovar() {
+  var m = V.modal; if (!m) return;
+  var it = V[m.kind][m.i];
+  it.docs[m.k] = RENOVAR;
+  var libre = !it.docs.some(function (d) { return d < 0; });
+  V.toast = 'Documento renovado: ' + it.nombre + ' · ' + DOCS[m.kind][m.k] + ' vigente hasta el ' + vFecha(RENOVAR) + '. ' +
+    (libre ? (m.kind === 'flota' ? 'La unidad queda habilitada para despacho.' : 'El conductor queda habilitado para despacho.') : 'Aún quedan documentos vencidos.');
+  V.modal = null;
+  renderVenc();
+}
+
+/* =========================================================
+   MANIFIESTOS
+   ========================================================= */
+var M = {
+  modal: null, toast: '',
+  filas: [
+    { cod: 'MAN-2026-0084', gen: 'Minera Cerro Verde', carga: 'Ácido Sulfúrico Residual', onu: 'ONU 1830', clase: 'Clase 8 · Corrosivo', peso: '28,5', placa: 'V9A-842', cond: 'Edwin Mamani Condori', estado: 'ruta', gre: 'ok', mr: 'ok', msds: 'ok', cdf: 'pend' },
+    { cod: 'MAN-2026-0085', gen: 'Cementos Yura', carga: 'Aceites Usados', onu: 'ONU 3082', clase: 'Clase 9 · Peligroso para el medio ambiente', peso: '12,0', placa: 'V6H-405', cond: 'Marco Ccama Layme', estado: 'programado', gre: 'ok', mr: 'pend', msds: 'falta', cdf: 'pend' },
+    { cod: 'MAN-2026-0086', gen: 'Industrias del Sur', carga: 'Lodos Industriales', onu: 'Sin código ONU', clase: 'Tóxico · según caracterización', peso: '24,0', placa: 'V7M-543', cond: 'Néstor Flores Apaza', estado: 'ruta', gre: 'ok', mr: 'ok', msds: 'ok', cdf: 'pend' },
+    { cod: 'MAN-2026-0083', gen: 'Minera Cerro Verde', carga: 'Solución Cáustica Gastada', onu: 'ONU 1824', clase: 'Clase 8 · Corrosivo', peso: '26,0', placa: 'V2D-558', cond: 'Freddy Turpo Challco', estado: 'entregado', gre: 'ok', mr: 'ok', msds: 'ok', cdf: 'pend' },
+    { cod: 'MAN-2026-0082', gen: 'Cementos Yura', carga: 'Lodos Industriales', onu: 'Sin código ONU', clase: 'Tóxico · según caracterización', peso: '18,0', placa: 'V9K-316', cond: 'Henry Quispe Lupaca', estado: 'entregado', gre: 'ok', mr: 'ok', msds: 'ok', cdf: 'pend' },
+    { cod: 'MAN-2026-0079', gen: 'Industrias del Sur', carga: 'Aceites Usados', onu: 'ONU 3082', clase: 'Clase 9 · Peligroso para el medio ambiente', peso: '14,5', placa: 'V1G-679', cond: 'Jhon Callo Mamani', estado: 'completado', gre: 'ok', mr: 'ok', msds: 'ok', cdf: 'ok' }
+  ]
+};
+var M_KEYS = ['gre', 'mr', 'msds', 'cdf'];
+var M_NOMBRES = { gre: 'GRE-T', mr: 'Manifiesto', msds: 'MSDS/NFPA', cdf: 'CDF' };
+var M_LARGO = {
+  gre: 'GRE-T (Guía de Remisión Electrónica Transportista)',
+  mr: 'Manifiesto MR (Manejo de Residuos Sólidos Peligrosos, formato MINAM)',
+  msds: 'MSDS / NFPA (Hoja de Datos de Seguridad y rombo de peligrosidad)',
+  cdf: 'CDF (Certificado de Disposición Final / Tratamiento)'
+};
+var M_ESTADOS = {
+  programado: { t: 'Programado', tone: 'neutral' },
+  ruta: { t: 'En ruta', tone: 'ok' },
+  entregado: { t: 'Entregado · pendiente de cierre', tone: 'info' },
+  completado: { t: 'Completado y Listo para Reporte SIGERSOL', tone: 'dark' }
+};
+var DSTATE = {
+  ok: { pal: 'Validado', ic: 'check' },
+  pend: { pal: 'Pendiente', ic: 'clock' },
+  falta: { pal: 'Faltante', ic: 'x' }
+};
+
+function renderMan() {
+  var F = M.filas;
+  var cnt = function (fn) { return F.filter(fn).length; };
+  $('#m-kpis').innerHTML =
+    kpi('truck', 'ok', 'Manifiestos activos en ruta', cnt(function (f) { return f.estado === 'ruta'; })) +
+    kpi('file', 'info', 'Pendientes de cierre (SIGERSOL)', cnt(function (f) { return f.estado === 'entregado'; })) +
+    kpi('shield', 'bad', 'Bloqueados por falta de MSDS', cnt(function (f) { return f.msds === 'falta'; })) +
+    kpi('award', 'dark', 'Certificados emitidos del mes', 5 + cnt(function (f) { return f.estado === 'completado'; }));
+
+  $('#m-rows').innerHTML = F.map(function (f, i) {
+    var okN = M_KEYS.filter(function (k) { return f[k] === 'ok'; }).length;
+    var track = M_KEYS.map(function (k, idx) {
+      var s = DSTATE[f[k]], est = k === 'cdf' && f[k] === 'ok' ? 'Emitido' : s.pal;
+      var link = f[k] === 'ok' && idx < 3 && f[M_KEYS[idx + 1]] === 'ok' ? ' link' : '';
+      var tip = M_LARGO[k] + ': ' + est;
+      return '<button type="button" class="dstep d-' + f[k] + link + '" title="' + esc(tip) + '" aria-label="' + esc(tip) + '" data-act="badge" data-i="' + i + '" data-k="' + k + '">' +
+        '<span class="dc">' + ico(s.ic, 17, 2.8) + '</span><span class="dn">' + M_NOMBRES[k] + '</span><span class="ds">' + est + '</span></button>';
+    }).join('');
+    var e = M_ESTADOS[f.estado];
+    return '<tr>' +
+      '<td><span class="a" style="font-size:15px">' + f.cod + '</span><span class="b" style="font-size:14px;line-height:20px;color:#524b48">' + esc(f.gen) + '</span></td>' +
+      '<td><span class="a">' + esc(f.carga) + '</span><span class="b">' + esc(f.onu) + ' · ' + f.peso + ' TM</span></td>' +
+      '<td><span class="a">' + f.placa + '</span><span class="b">' + esc(f.cond) + '</span></td>' +
+      '<td><p class="dsum"><b>' + okN + ' de 4</b> documentos validados</p><div class="doctrack">' + track + '</div></td>' +
+      '<td style="width:300px"><div class="acts">' + pill(e.t, e.tone) +
+      (f.msds === 'falta' ? '<div class="alert"><p>' + ico('alert', 16, 2.2) + 'Salida restringida: Falta Hoja de Seguridad</p><button type="button" class="btn" style="font-size:14px" data-act="msds" data-i="' + i + '">Subir / Validar MSDS →</button></div>' : '') +
+      (f.estado === 'entregado' ? '<button type="button" class="btn sm" data-act="emit" data-i="' + i + '">Emitir Certificado de Disposición Final →</button>' : '') +
+      '<button type="button" class="btn out" style="font-size:14px" data-act="man" data-i="' + i + '">Ver Manifiesto</button></div></td></tr>';
+  }).join('');
+
+  var t = $('#m-toast');
+  t.hidden = !M.toast; t.innerHTML = M.toast ? ico('check', 18, 2.6) + '<span>' + esc(M.toast) + '</span>' : '';
+
+  var mo = $('#modal-man');
+  if (M.modal !== null) {
+    var m = F[M.modal], hoy = fmtD(Date.now());
+    var row = function (a, b, strong) { return '<p>' + a + '</p><p' + (strong ? ' style="font-weight:500"' : '') + '>' + b + '</p>'; };
+    $('#mm-box').innerHTML =
+      '<div class="dochead"><div><p class="e">Manifiesto de manejo de residuos sólidos peligrosos</p><h2 id="mm-titulo">' + m.cod + '</h2></div>' +
+      '<div style="text-align:right"><p style="font-size:13px;line-height:18px;color:#54595f">Fecha de emisión</p><p style="font-weight:500;color:#141414">' + hoy + '</p></div></div>' +
+      '<div class="docsec"><h3>1 · Datos del generador</h3><div class="docgrid">' + row('Razón social', esc(m.gen), true) + row('RUC y dirección', '[RUC] · [DIRECCIÓN DEL GENERADOR]') + '</div></div>' +
+      '<div class="docsec"><h3>2 · Empresa operadora de residuos sólidos (EO-RS) transportista</h3><div class="docgrid">' + row('Razón social', 'QUIMSSA SRL · EO-RS', true) + row('Registro EO-RS', '[N.º DE REGISTRO EO-RS]') + row('Unidad y conductor', m.placa + ' · ' + esc(m.cond)) + '</div></div>' +
+      '<div class="docsec"><h3>3 · Residuo transportado</h3><div class="docgrid">' + row('Descripción', esc(m.carga), true) + row('Peligrosidad', esc(m.clase)) + row('Código ONU', esc(m.onu)) + row('Peso neto', m.peso + ' TM', true) + '</div></div>' +
+      '<div class="docsec"><h3>4 · Tratamiento o disposición final</h3><div class="docgrid" style="grid-template-columns:1fr"><p>[EMPRESA OPERADORA Y PLANTA DE DESTINO]</p></div></div>' +
+      '<div class="firmas"><div class="firma"><p class="e">Generador</p><p>Firma digital simulada</p></div>' +
+      '<div class="firma"><p class="e">Transportista</p><p class="f">Firmado digitalmente (simulación)</p><p>QUIMSSA SRL · ' + hoy + '</p></div>' +
+      '<div class="firma"><p class="e">Receptor final</p><p>Firma digital simulada</p></div></div>' +
+      '<div class="mact"><button type="button" class="btn out" data-act="man-close">Cerrar</button><button type="button" class="btn" data-act="man-pdf">Descargar / Imprimir PDF →</button></div>';
+    mo.hidden = false;
+  } else { mo.hidden = true; }
+}
+
+/* =========================================================
+   NAVEGACIÓN Y EVENTOS
+   ========================================================= */
+var VISTAS = {
+  torre: { t: 'Torre de Control Logístico', s: 'Seguimiento de viajes de químicos en tiempo real' },
+  venc: { t: 'Vencimientos de Flota y Licencias A-IV', s: 'Cumplimiento MTC · MATPEL · ISO 45001' },
+  man: { t: 'Manifiestos Ambientales y Documentación MATPEL', s: 'Auditoría ISO 14001 · OEFA · MINAM · SIGERSOL' }
+};
+function showView(v) {
+  if (!VISTAS[v]) v = 'torre';
+  ['torre', 'venc', 'man'].forEach(function (k) {
+    $('#v-' + k).hidden = k !== v;
+    var b = document.querySelector('.nav [data-v="' + k + '"]');
+    if (k === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  $('#titulo').textContent = VISTAS[v].t;
+  $('#subtitulo').textContent = VISTAS[v].s;
+  $('#btn-driver').hidden = v !== 'torre';
+  if (v === 'torre') renderTorre();
+  if (v === 'venc') renderVenc();
+  if (v === 'man') renderMan();
+  if (location.hash !== '#' + v) { try { history.replaceState(null, '', '#' + v); } catch (e) {} }
+}
+
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('[data-act]');
+  if (!el) {
+    if (e.target === $('#modal-venc')) { V.modal = null; renderVenc(); }
+    if (e.target === $('#modal-man')) { M.modal = null; renderMan(); }
+    return;
+  }
+  var d = el.dataset, i = parseInt(d.i, 10);
+  switch (d.act) {
+    case 'nav': showView(d.v); break;
+    /* Torre */
+    case 'route': T.sel = i; T.drv = 'ok'; T.toast = ''; $('#obs').value = ''; renderTorre(); break;
+    case 'hours': T.hoursRaw = d.h; $('#t-horas').value = d.h; renderProj(); break;
+    case 'driver': T.showDriver = !T.showDriver; renderPhone(); break;
+    case 'drv': T.drv = d.k; renderPhone(); break;
+    case 'confirm': confirmar(); break;
+    /* Vencimientos */
+    case 'tab': V.tab = d.t; V.filtro = 'todos'; renderVenc(); break;
+    case 'filter': V.filtro = d.f; renderVenc(); break;
+    case 'renew': V.modal = { kind: V.tab, i: i, k: parseInt(d.k, 10) }; renderVenc(); var ok = $('#mv-ok'); if (ok) ok.focus(); break;
+    case 'renew-cancel': V.modal = null; renderVenc(); break;
+    case 'renew-ok': renovar(); break;
+    /* Manifiestos */
+    case 'badge': {
+      var f = M.filas[i], k = d.k;
+      if (k === 'cdf') { M.toast = 'El CDF se emite al cierre del viaje, con el botón “Emitir Certificado de Disposición Final”.'; }
+      else if (f[k] !== 'ok') { f[k] = 'ok'; M.toast = M_NOMBRES[k] + ' validado en el expediente ' + f.cod + ' (simulación).'; }
+      renderMan(); break;
+    }
+    case 'msds': M.filas[i].msds = 'ok'; M.toast = 'MSDS validada en el expediente ' + M.filas[i].cod + '. Despacho habilitado para salir.'; renderMan(); break;
+    case 'emit': M.filas[i].cdf = 'ok'; M.filas[i].estado = 'completado'; M.toast = 'Certificado de Disposición Final emitido: ' + M.filas[i].cod + ' queda completado y listo para reporte SIGERSOL.'; renderMan(); break;
+    case 'man': M.modal = i; renderMan(); break;
+    case 'man-close': M.modal = null; renderMan(); break;
+    case 'man-pdf': M.toast = 'PDF generado: ' + M.filas[M.modal].cod + '.pdf (simulación de descarga).'; M.modal = null; renderMan(); break;
+  }
+});
+
+$('#t-horas').addEventListener('input', function (e) { T.hoursRaw = e.target.value; renderProj(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    if (V.modal) { V.modal = null; renderVenc(); }
+    if (M.modal !== null) { M.modal = null; renderMan(); }
+  }
+});
+window.addEventListener('hashchange', function () { showView(location.hash.replace('#', '')); });
+
+showView(location.hash.replace('#', '') || 'torre');
+})();
+</script>
+</body>
+</html>
